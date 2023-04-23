@@ -7,6 +7,7 @@ import (
 
 func GetAllPost(c echo.Context) error {
 	return c.String(http.StatusOK, "ok")
+
 }
 
 func GetOnePost(c echo.Context) error {
