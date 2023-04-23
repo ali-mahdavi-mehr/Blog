@@ -2,10 +2,12 @@ package main
 
 import (
 	"github.com/alima12/Blog-Go/api"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 )
 
 func main() {
+	_ = godotenv.Load(".env")
 	e := echo.New()
 	e.GET("/", api.Home)
 	api.RegisterAPIs(e.Group("/api"))
