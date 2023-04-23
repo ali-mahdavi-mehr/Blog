@@ -8,6 +8,6 @@ import (
 func main() {
 	e := echo.New()
 	e.GET("/", api.Home)
-	api.Register(e.Router())
+	api.RegisterAPIs(e.Group("/api"))
 	e.Logger.Fatal(e.Start(":8000"))
 }
