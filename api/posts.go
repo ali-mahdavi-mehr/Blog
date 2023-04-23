@@ -19,5 +19,5 @@ func CreatePost(c echo.Context) error {
 }
 
 func DeletePost(c echo.Context) error {
-	return c.String(http.StatusOK, "ok")
+	return c.String(http.StatusNoContent, "ok")
 }

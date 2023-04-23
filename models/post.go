@@ -1,11 +1,12 @@
 package models
 
-import "time"
+import (
+	"gorm.io/gorm"
+)
 
 type Post struct {
-	Title     string
-	Author    User
-	Body      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	gorm.Model
+	Title  string
+	Author User `gorm:"embedded"`
+	Body   string
 }
