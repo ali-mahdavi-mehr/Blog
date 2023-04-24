@@ -8,4 +8,5 @@ type User struct {
 	LastName  string
 	Username  string
 	Email     *string
+	Post      []Post
 }

@@ -7,6 +7,6 @@ import (
 type Post struct {
 	gorm.Model
 	Title  string
-	Author User `gorm:"embedded"`
+	UserID uint
 	Body   string
 }
