@@ -8,6 +8,7 @@ import (
 func RegisterAPIs(router *echo.Group) {
 	//Auth
 	router.POST("/auth/login/", Login)
+	router.POST("/auth/sign-up/", SignUp)
 
 	//Posts
 	postRouter := router.Group("/post/")

@@ -10,5 +10,6 @@ type User struct {
 	LastName  string
 	Username  string
 	Email     *string
+	Password  string
 	Post      []Post
 }
