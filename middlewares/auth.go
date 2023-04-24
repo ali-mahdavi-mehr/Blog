@@ -18,11 +18,12 @@ func LoginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 			return []byte(os.Getenv("secret_key")), nil
 		})
 		if err != nil {
-			return echo.ErrBadRequest
+			return echo.ErrUnauthorized
 		}
 		db := database.GetRedisClient()
 		result := db.Get(context.TODO(), claims.Aid)
 		if result.Val() == bearerToken {
+			c.Request().Header.Set("user_id", claims.Username)
 			return next(c)
 		}
 		return echo.ErrUnauthorized
