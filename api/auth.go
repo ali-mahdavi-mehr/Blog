@@ -12,7 +12,10 @@ import (
 func Login(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
-	if username == "" || password == "" {
+	db := database.GetDB()
+	var user models.User
+	db.Model(&models.User{}).Find(&user, "username = ?", username)
+	if !utils.CheckPassword(password, user.Password) {
 		return echo.ErrUnauthorized
 	}
 	accessToken := utils.CreateToken("access", username)
@@ -37,7 +40,10 @@ func SignUp(c echo.Context) error {
 	_ = c.Bind(&user)
 
 	db := database.GetDB()
+
+	user.Password, _ = utils.HashPassword(user.Password)
 	result := db.Create(&user)
+
 	if result.Error != nil {
 		return echo.ErrBadRequest
 	}
