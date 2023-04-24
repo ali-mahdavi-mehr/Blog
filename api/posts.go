@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
-	"github.com/alima12/Blog-Go/validation"
+	"github.com/alima12/Blog-Go/validations"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
 	"net/http"
@@ -34,7 +34,7 @@ func GetOnePost(c echo.Context) error {
 
 func CreatePost(c echo.Context) error {
 	// validate data
-	data := new(validation.PostValidation)
+	data := new(validations.PostValidation)
 	if err := c.Bind(data); err != nil {
 		return echo.ErrBadRequest
 	}
@@ -43,9 +43,7 @@ func CreatePost(c echo.Context) error {
 	}
 
 	var post models.Post
-	if err := c.Bind(&post); err != nil {
-		return echo.ErrBadRequest
-	}
+	_ = c.Bind(&post)
 
 	// Find Author
 	db := database.GetDB()
