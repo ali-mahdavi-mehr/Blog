@@ -1,5 +1,5 @@
 #### to generate grpc files
-`protoc --go_out=./service \                                                                             ─╯
+`protoc --go_out=./service \
 --go_opt=paths=source_relative \
 --go-grpc_out=./service/compiles \
 --go-grpc_opt=paths=source_relative \
