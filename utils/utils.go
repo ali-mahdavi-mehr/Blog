@@ -17,7 +17,7 @@ func generateAid() string {
 	return id.String()
 }
 
-func CreateToken(tokenType, username string) string {
+func CreateToken(tokenType, userId string) string {
 	var JwtExpireTime int64
 	switch tokenType {
 	case "access":
@@ -28,7 +28,7 @@ func CreateToken(tokenType, username string) string {
 	}
 	generatedAid := generateAid()
 	claims := &models.Auth{
-		username,
+		userId,
 		generatedAid,
 		fmt.Sprintf("%s_type", tokenType),
 
