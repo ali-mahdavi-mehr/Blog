@@ -23,7 +23,7 @@ func LoginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 		db := database.GetRedisClient()
 		result := db.Get(context.TODO(), claims.Aid)
 		if result.Val() == bearerToken {
-			c.Request().Header.Set("user_id", claims.Username)
+			c.Request().Header.Set("user_id", claims.UserId)
 			return next(c)
 		}
 		return echo.ErrUnauthorized
