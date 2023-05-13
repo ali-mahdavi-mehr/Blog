@@ -10,11 +10,11 @@ import (
 func createPostgresConnection() func() *gorm.DB {
 	dataBaseConnection := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Tehran",
-		os.Getenv("postgres_host"),
-		os.Getenv("postgres_user"),
-		os.Getenv("postgres_password"),
-		os.Getenv("postgres_db_name"),
-		os.Getenv("postgres_port"))
+		os.Getenv("POSTGRES_HOST"),
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_DB_NAME"),
+		os.Getenv("POSTGRES_PORT"))
 	db, err := gorm.Open(postgres.Open(dataBaseConnection), &gorm.Config{})
 	if err != nil {
 		panic("error in connection")

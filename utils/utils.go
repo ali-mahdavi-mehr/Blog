@@ -21,9 +21,9 @@ func CreateToken(tokenType, username string) string {
 	var JwtExpireTime int64
 	switch tokenType {
 	case "access":
-		JwtExpireTime, _ = strconv.ParseInt(os.Getenv("jwt_access_expire_time"), 10, 32)
+		JwtExpireTime, _ = strconv.ParseInt(os.Getenv("JWT_ACCESS_EXPIRE_TIME"), 10, 32)
 	case "refresh":
-		JwtExpireTime, _ = strconv.ParseInt(os.Getenv("jwt_refresh_expire_time"), 10, 32)
+		JwtExpireTime, _ = strconv.ParseInt(os.Getenv("JWT_REFRESH_EXPIRE_TIME"), 10, 32)
 
 	}
 	generatedAid := generateAid()
@@ -37,7 +37,7 @@ func CreateToken(tokenType, username string) string {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	createdToken, err := token.SignedString([]byte(os.Getenv("secret_key")))
+	createdToken, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
 		return ""
 	}

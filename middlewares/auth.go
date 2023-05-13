@@ -15,7 +15,7 @@ func LoginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 		claims := models.Auth{}
 		bearerToken := strings.Replace(c.Request().Header.Get("Authorization"), "Bearer ", "", 1)
 		_, err := jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(os.Getenv("secret_key")), nil
+			return []byte(os.Getenv("SECRET_KEY")), nil
 		})
 		if err != nil {
 			return echo.ErrUnauthorized
