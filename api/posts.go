@@ -7,11 +7,11 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
 	"net/http"
+	"strconv"
 )
 
 func GetAllPost(c echo.Context) error {
 	db := database.GetDB()
-
 	var posts []models.Post
 	err := db.Model(&models.Post{}).Find(&posts).Error
 	if err != nil {
@@ -22,12 +22,10 @@ func GetAllPost(c echo.Context) error {
 }
 
 func GetOnePost(c echo.Context) error {
-	db := database.GetDB()
-	id := c.Param("id")
 	var post models.Post
-	result := db.First(&post, id)
-	if result.Error != nil {
-		return c.String(http.StatusNotFound, "post not found")
+	err := post.GetOne(c.Param("id"))
+	if err != nil {
+		return c.String(http.StatusNotFound, err.Error())
 	}
 	return c.JSON(http.StatusOK, post)
 }
@@ -42,27 +40,26 @@ func CreatePost(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 
+	// binding data
 	var post models.Post
 	_ = c.Bind(&post)
 
 	// Find Author
-	db := database.GetDB()
-	username := c.Request().Header.Get("user_id")
-	var user models.User
-	db.Model(&models.User{}).Find(&user, "username = ?", username)
-	post.UserID = user.ID
+	userID := c.Request().Header.Get("user_id")
+	id, _ := strconv.ParseInt(userID, 10, 32)
+	post.UserID = uint(id)
 
 	// Save Post
-	db.Create(&post)
+	post.Create()
 	return c.JSON(http.StatusCreated, post)
 }
 
 func DeletePost(c echo.Context) error {
-	db := database.GetDB()
-	id := c.Param("id")
-	result := db.Delete(&models.Post{}, "id = ?", id)
-	if result.RowsAffected == 1 {
+	var post models.Post
+	err := post.Delete(c.Param("id"))
+	if err != nil {
+		return c.String(http.StatusNotFound, err.Error())
+	} else {
 		return c.NoContent(http.StatusNoContent)
 	}
-	return c.String(http.StatusNotFound, "post not found!")
 }

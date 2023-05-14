@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/alima12/Blog-Go/api"
+	"github.com/alima12/Blog-Go/cmd/rpc"
 	"github.com/alima12/Blog-Go/models"
 	"github.com/alima12/Blog-Go/validations"
 	"github.com/joho/godotenv"
@@ -13,6 +14,8 @@ func main() {
 	//Load Env files
 	_ = godotenv.Load(".env")
 
+	// if you don't want to start two server, comment below code and change start point
+	go rpc.StartRpcServer()
 	//Register Validators
 	e.Validator = &validations.CustomValidator{Validator: validations.RegisterCustomValidations()}
 

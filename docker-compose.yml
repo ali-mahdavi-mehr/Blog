@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+  redis:
+    container_name: redis
+    restart: always
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+  nginx:
+    build: './nginx'
+    container_name: 'nginx'
+    restart: 'always'
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+#    volumes:
+#      - type: 'bind'
+#        source: './static'
+#        target: '/web/static'
+
+  db:
+    container_name: db
+    restart: always
+    image: postgres:latest
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  web:
+    container_name: web
+    restart: always
+    build: .
+    volumes:
+      - .:/code
+    expose:
+      - 8000
+    depends_on:
+      - db
+      - nginx
+
+networks:
+  main:
