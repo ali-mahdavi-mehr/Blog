@@ -26,3 +26,23 @@ func (ps *PostService) GetSinglePost(context.Context, *compiles.RetrievePost) (*
 	}
 	return response, nil
 }
+
+func (ps *PostService) GetAllPosts(context.Context, *compiles.Empty) (*compiles.AllPostResponse, error) {
+	db := database.GetDB()
+	var posts []models.Post
+	err := db.Model(&models.Post{}).Find(&posts).Error
+	if err != nil {
+		return nil, err
+	}
+	objects := make([]*compiles.SinglePostResponse, 0)
+	for _, post := range posts {
+		p := &compiles.SinglePostResponse{
+			Title:  post.Title,
+			Body:   post.Body,
+			UserID: int32(post.UserID),
+		}
+		objects = append(objects, p)
+	}
+	response := &compiles.AllPostResponse{Posts: objects}
+	return response, nil
+}
