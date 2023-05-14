@@ -3,6 +3,10 @@ package Post;
 option go_package = "./compiles";
 import "google/protobuf/timestamp.proto";
 
+message Empty{
+
+}
+
 message SinglePostResponse{
   string Title = 1;
   int32 UserID = 2;
@@ -12,10 +16,16 @@ message SinglePostResponse{
   google.protobuf.Timestamp UpdatedAt = 5;
 }
 
+message AllPostResponse{
+  repeated SinglePostResponse posts = 1;
+}
+
 message RetrievePost{
   int32 PostId = 1;
 }
 
 service PostService {
   rpc GetSinglePost(RetrievePost) returns (SinglePostResponse);
+  rpc GetAllPosts(Empty) returns (AllPostResponse);
+
 }
