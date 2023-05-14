@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"github.com/alima12/Blog-Go/service/compiles"
-	"github.com/alima12/Blog-Go/service/service_models"
+	"github.com/alima12/Blog-Go/service/manager"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"log"
@@ -17,7 +17,7 @@ func StartRpcServer() {
 	}
 	server := grpc.NewServer()
 
-	service := &service_models.PostService{}
+	service := &manager.PostService{}
 	compiles.RegisterPostServiceServer(server, service)
 	err = server.Serve(lis)
 	if err != nil {

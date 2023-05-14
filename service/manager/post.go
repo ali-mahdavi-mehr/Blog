@@ -1,4 +1,4 @@
-package service_models
+package manager
 
 import (
 	"context"
