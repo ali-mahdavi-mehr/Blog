@@ -1,13 +1,23 @@
+# Go Blog
+
+
+#### Generate proto files
 #### to generate grpc files
-`protoc --go_out=./service \
+
+```
+protoc --go_out=./service \
 --go-grpc_out=./service \
 proto/*.proto
-`
+```
 
-see [Document](https://grpc.io/docs/languages/go/quickstart/)  to install requirements for re-generating grpc files
+### Requirements
+***just read the documentation*** :smiley:
+- see [Document](https://grpc.io/docs/languages/go/quickstart/)  to install requirements for re-generating grpc files
 
 
-### To Run Project
+## Usage
+
+#### To Run Project
 config .env file
 `.env-sample => .env`
 
