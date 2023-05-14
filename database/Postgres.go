@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+var client func() *gorm.DB
+
 func createPostgresConnection() func() *gorm.DB {
 	dataBaseConnection := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Tehran",
@@ -25,6 +27,8 @@ func createPostgresConnection() func() *gorm.DB {
 }
 
 func GetDB() *gorm.DB {
-	client := createPostgresConnection()
+	if client == nil {
+		client = createPostgresConnection()
+	}
 	return client()
 }
