@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var client func() *gorm.DB
+var postgresConnection func() *gorm.DB
 
 func createPostgresConnection() func() *gorm.DB {
 	dataBaseConnection := fmt.Sprintf(
@@ -27,8 +27,8 @@ func createPostgresConnection() func() *gorm.DB {
 }
 
 func GetDB() *gorm.DB {
-	if client == nil {
-		client = createPostgresConnection()
+	if postgresConnection == nil {
+		postgresConnection = createPostgresConnection()
 	}
-	return client()
+	return postgresConnection()
 }
