@@ -5,18 +5,22 @@ import (
 	"os"
 )
 
+var redisConnection func() *redis.Client
+
 func createRedisConnection() func() *redis.Client {
-	client := redis.NewClient(&redis.Options{
+	redisClient := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_HOST"),
 		Password: "",
 		DB:       0,
 	})
 	return func() *redis.Client {
-		return client
+		return redisClient
 	}
 }
 
 func GetRedisClient() *redis.Client {
-	client := createRedisConnection()
-	return client()
+	if redisConnection == nil {
+		redisConnection = createRedisConnection()
+	}
+	return redisConnection()
 }
