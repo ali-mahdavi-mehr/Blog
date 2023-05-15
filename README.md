@@ -4,11 +4,11 @@ with:
 - Authentication
 - CRUD post
 
-###
-the user can get posts by:
-+ REST API Request
+### Client Usage
+the clients can fetch posts in three ways:
++ HTTP Request (REST API)
 + gRPC request
-+ Graphql request
++ Graphql
 
 
 #### DataBases
