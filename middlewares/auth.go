@@ -22,6 +22,7 @@ func LoginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		db := database.GetRedisClient()
 		result := db.Get(context.TODO(), claims.Aid)
+		//userID := strconv.FormatUint(claims.UserId, 10)
 		if result.Val() == bearerToken {
 			c.Request().Header.Set("user_id", claims.UserId)
 			return next(c)
