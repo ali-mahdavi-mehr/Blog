@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
 	"github.com/alima12/Blog-Go/validations"
@@ -18,7 +17,6 @@ func GetAllPost(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println()
 	return c.JSON(http.StatusOK, posts)
 
 }
