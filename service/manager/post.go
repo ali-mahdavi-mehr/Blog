@@ -21,7 +21,7 @@ func (ps *PostService) GetSinglePost(context.Context, *compiles.RetrievePost) (*
 	}
 	response := &compiles.SinglePostResponse{
 		Title:  post.Title,
-		Body:   post.Body,
+		Body:   post.Content,
 		UserID: int32(post.UserID),
 	}
 	return response, nil
@@ -38,7 +38,7 @@ func (ps *PostService) GetAllPosts(context.Context, *compiles.Empty) (*compiles.
 	for _, post := range posts {
 		p := &compiles.SinglePostResponse{
 			Title:  post.Title,
-			Body:   post.Body,
+			Body:   post.Content,
 			UserID: int32(post.UserID),
 		}
 		objects = append(objects, p)

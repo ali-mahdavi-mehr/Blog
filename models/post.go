@@ -1,19 +1,38 @@
 package models
 
 import (
+	"database/sql/driver"
 	"errors"
 	"github.com/alima12/Blog-Go/database"
 	"gorm.io/gorm"
-	"time"
 )
+
+type Status string
+
+const (
+	Draft     Status = "draft"
+	Pending   Status = "pending"
+	Published Status = "published"
+)
+
+func (s *Status) Scan(value interface{}) error {
+	*s = Status(value.(string))
+	return nil
+}
+
+func (s Status) Value() (driver.Value, error) {
+	return string(s), nil
+}
 
 type Post struct {
 	gorm.Model
-	Title     string
-	UserID    uint
-	Body      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Slug     string `gorm:"not null, unique"`
+	Title    string `gorm:"not null"`
+	UserID   uint   `gorm:"not null"`
+	Content  string `gorm:"not null"`
+	ImageURL string
+	Status   Status `gorm:"not null;check:status IN ('draft', 'pending', 'published')"`
+	Views    int64  `gorm:"default:0"`
 }
 
 func (model *Post) GetOne(id string) error {
