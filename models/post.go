@@ -54,7 +54,8 @@ func (model *Post) Delete(id string) error {
 	}
 }
 
-func (model *Post) Create() {
+func (model *Post) Create() error {
 	db := database.GetDB()
-	db.Create(&model)
+	result := db.Create(&model)
+	return result.Error
 }
