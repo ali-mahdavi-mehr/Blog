@@ -1,7 +1,7 @@
 package api
 
 import (
-	custumerror "github.com/alima12/Blog-Go/custom_error"
+	customError "github.com/alima12/Blog-Go/custom_error"
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
 	"github.com/alima12/Blog-Go/utils"
@@ -44,7 +44,7 @@ func SignUp(c echo.Context) error {
 	user.Password, _ = utils.HashPassword(user.Password)
 	result := db.Create(&user)
 	if result.Error != nil {
-		return custumerror.FindDBError(result.Error, "user")
+		return customError.FindDBError(result.Error, "user")
 	}
 
 	return c.JSON(http.StatusCreated, user)
