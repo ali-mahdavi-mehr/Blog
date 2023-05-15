@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/labstack/echo"
 	"net/http"
+	"strconv"
 )
 
 func Login(c echo.Context) error {
@@ -19,8 +20,9 @@ func Login(c echo.Context) error {
 	if !utils.CheckPassword(password, user.Password) {
 		return echo.ErrUnauthorized
 	}
-	accessToken := utils.CreateToken("access", username)
-	refreshToken := utils.CreateToken("refresh", username)
+	userID := strconv.FormatUint(uint64(user.ID), 10)
+	accessToken := utils.CreateToken("access", userID)
+	refreshToken := utils.CreateToken("refresh", userID)
 	return c.JSON(http.StatusOK, echo.Map{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
