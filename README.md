@@ -42,7 +42,6 @@ go generate cmd/graph/graph
 #### To Run Project
 config __.env__ file by:
 `.env-sample => .env`
-
-## Run Project
+###### then
 run docker-compose by:
 > docker-compose up --build -d
