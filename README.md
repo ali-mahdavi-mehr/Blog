@@ -17,13 +17,19 @@ the clients can fetch posts in three ways:
 
 
 
-#### Generate proto files
-#### to generate grpc files
+#### Generate files
+#### to regenerate grpc files
 
 ```
 protoc --go_out=./service \
 --go-grpc_out=./service \
 proto/*.proto
+```
+
+#### to regenerate Graphql files
+
+```
+go generate cmd/graph/graph
 ```
 
 ### Requirements
