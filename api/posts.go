@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	custumerror "github.com/alima12/Blog-Go/custom_error"
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"

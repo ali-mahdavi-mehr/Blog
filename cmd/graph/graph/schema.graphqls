@@ -12,11 +12,14 @@ type Post{
   Views: Int!
 }
 
-input Null{
-  ID: Int!
+input CreatePost{
+  Slug: String!
+  Title: String!
+  Content: String!
+  ImageUrl: String!
 }
 
 
 type Mutation {
-  getAllPosts(input: Null!): Query!
+  createPost(input: CreatePost!): Post!
 }

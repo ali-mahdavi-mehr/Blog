@@ -46,7 +46,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		GetAllPosts func(childComplexity int, input model.Null) int
+		CreatePost func(childComplexity int, input model.CreatePost) int
 	}
 
 	Post struct {
@@ -65,7 +65,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	GetAllPosts(ctx context.Context, input model.Null) (*model.Post, error)
+	CreatePost(ctx context.Context, input model.CreatePost) (*model.Post, error)
 }
 type QueryResolver interface {
 	Posts(ctx context.Context) ([]*model.Post, error)
@@ -86,17 +86,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Mutation.getAllPosts":
-		if e.complexity.Mutation.GetAllPosts == nil {
+	case "Mutation.createPost":
+		if e.complexity.Mutation.CreatePost == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_getAllPosts_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createPost_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.GetAllPosts(childComplexity, args["input"].(model.Null)), true
+		return e.complexity.Mutation.CreatePost(childComplexity, args["input"].(model.CreatePost)), true
 
 	case "Post.Content":
 		if e.complexity.Post.Content == nil {
@@ -162,7 +162,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputNull,
+		ec.unmarshalInputCreatePost,
 	)
 	first := true
 
@@ -242,13 +242,13 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_getAllPosts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createPost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.Null
+	var arg0 model.CreatePost
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNull2githubᚗcomᚋalima12ᚋBlogᚑGoᚋcmdᚋgraphᚋgraphᚋmodelᚐNull(ctx, tmp)
+		arg0, err = ec.unmarshalNCreatePost2githubᚗcomᚋalima12ᚋBlogᚑGoᚋcmdᚋgraphᚋgraphᚋmodelᚐCreatePost(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -310,8 +310,8 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Mutation_getAllPosts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_getAllPosts(ctx, field)
+func (ec *executionContext) _Mutation_createPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createPost(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -324,7 +324,7 @@ func (ec *executionContext) _Mutation_getAllPosts(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().GetAllPosts(rctx, fc.Args["input"].(model.Null))
+		return ec.resolvers.Mutation().CreatePost(rctx, fc.Args["input"].(model.CreatePost))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -341,7 +341,7 @@ func (ec *executionContext) _Mutation_getAllPosts(ctx context.Context, field gra
 	return ec.marshalNPost2ᚖgithubᚗcomᚋalima12ᚋBlogᚑGoᚋcmdᚋgraphᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_getAllPosts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createPost(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -374,7 +374,7 @@ func (ec *executionContext) fieldContext_Mutation_getAllPosts(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_getAllPosts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createPost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -2651,29 +2651,56 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputNull(ctx context.Context, obj interface{}) (model.Null, error) {
-	var it model.Null
+func (ec *executionContext) unmarshalInputCreatePost(ctx context.Context, obj interface{}) (model.CreatePost, error) {
+	var it model.CreatePost
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"ID"}
+	fieldsInOrder := [...]string{"Slug", "Title", "Content", "ImageUrl"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "ID":
+		case "Slug":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ID"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Slug"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ID = data
+			it.Slug = data
+		case "Title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Title"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
+		case "Content":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Content"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
+		case "ImageUrl":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ImageUrl"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ImageURL = data
 		}
 	}
 
@@ -2707,10 +2734,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "getAllPosts":
+		case "createPost":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_getAllPosts(ctx, field)
+				return ec._Mutation_createPost(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -3195,6 +3222,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCreatePost2githubᚗcomᚋalima12ᚋBlogᚑGoᚋcmdᚋgraphᚋgraphᚋmodelᚐCreatePost(ctx context.Context, v interface{}) (model.CreatePost, error) {
+	res, err := ec.unmarshalInputCreatePost(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3208,11 +3240,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNNull2githubᚗcomᚋalima12ᚋBlogᚑGoᚋcmdᚋgraphᚋgraphᚋmodelᚐNull(ctx context.Context, v interface{}) (model.Null, error) {
-	res, err := ec.unmarshalInputNull(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNPost2githubᚗcomᚋalima12ᚋBlogᚑGoᚋcmdᚋgraphᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v model.Post) graphql.Marshaler {

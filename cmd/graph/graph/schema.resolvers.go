@@ -13,9 +13,28 @@ import (
 	"github.com/alima12/Blog-Go/models"
 )
 
-// GetAllPosts is the resolver for the getAllPosts field.
-func (r *mutationResolver) GetAllPosts(ctx context.Context, input graphModel.Null) (*graphModel.Post, error) {
-	panic("not implemented")
+// CreatePost is the resolver for the createPost field.
+func (r *mutationResolver) CreatePost(ctx context.Context, input graphModel.CreatePost) (*graphModel.Post, error) {
+	var post models.Post
+	post.Title = input.Title
+	post.Content = input.Content
+	post.Slug = input.Slug
+	post.ImageURL = input.ImageURL
+	post.UserID = uint(1)
+	post.Status = "published"
+	db := database.GetDB()
+	err := db.Create(&post).Error
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &graphModel.Post{
+		Title:    post.Title,
+		Content:  post.Content,
+		Slug:     post.Slug,
+		UserID:   int(post.UserID),
+		ImageURL: post.ImageURL,
+		Views:    int(post.Views),
+	}, nil
 }
 
 // Posts is the resolver for the posts field.
