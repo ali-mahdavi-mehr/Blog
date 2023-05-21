@@ -1,0 +1,22 @@
+type Query {
+  posts: [Post!]!
+}
+
+type Post{
+  Slug: String!
+  Title: String!
+  UserID: Int!
+  Content: String!
+  ImageURL: String!
+  Status: Int!
+  Views: Int!
+}
+
+input Null{
+  ID: Int!
+}
+
+
+type Mutation {
+  getAllPosts(input: Null!): Query!
+}
