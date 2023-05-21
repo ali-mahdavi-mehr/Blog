@@ -18,7 +18,6 @@ func GetAllPost(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println()
 	return c.JSON(http.StatusOK, posts)
 
 }
