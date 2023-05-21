@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+	custumerror "github.com/alima12/Blog-Go/custom_error"
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
 	"github.com/alima12/Blog-Go/validations"
@@ -50,7 +52,9 @@ func CreatePost(c echo.Context) error {
 	post.UserID = uint(id)
 
 	// Save Post
-	post.Create()
+	if err := post.Create(); err != nil {
+		return custumerror.FindDBError(err, "slug post")
+	}
 	return c.JSON(http.StatusCreated, post)
 }
 

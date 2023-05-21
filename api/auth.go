@@ -1,11 +1,11 @@
 package api
 
 import (
+	customError "github.com/alima12/Blog-Go/custom_error"
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
 	"github.com/alima12/Blog-Go/utils"
 	"github.com/alima12/Blog-Go/validations"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
@@ -46,14 +46,7 @@ func SignUp(c echo.Context) error {
 	user.Password, _ = utils.HashPassword(user.Password)
 	result := db.Create(&user)
 	if result.Error != nil {
-		err := result.Error.(*pgconn.PgError)
-		switch {
-		case err.Code == "23505":
-			return echo.NewHTTPError(http.StatusConflict, "user already exists!")
-		default:
-			return echo.NewHTTPError(http.StatusInternalServerError, result.Error.Error())
-
-		}
+		return customError.FindDBError(result.Error, "user")
 	}
 
 	return c.JSON(http.StatusCreated, user)

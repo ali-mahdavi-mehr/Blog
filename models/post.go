@@ -26,13 +26,13 @@ func (s Status) Value() (driver.Value, error) {
 
 type Post struct {
 	gorm.Model
-	Slug     string `gorm:"not null, unique"`
-	Title    string `gorm:"not null"`
-	UserID   uint   `gorm:"not null"`
-	Content  string `gorm:"not null"`
-	ImageURL string
-	Status   Status `gorm:"not null;check:status IN ('draft', 'pending', 'published')"`
-	Views    int64  `gorm:"default:0"`
+	Slug     string `gorm:"not null, unique" json:"slug"`
+	Title    string `gorm:"not null" json:"title"`
+	UserID   uint   `gorm:"not null" json:"author"`
+	Content  string `gorm:"not null" json:"content"`
+	ImageURL string `json:"image_url"`
+	Status   Status `gorm:"not null;check:status IN ('draft', 'pending', 'published')" json:"status"`
+	Views    int64  `gorm:"default:0" json:"view_count"`
 }
 
 func (model *Post) GetOne(id string) error {
@@ -54,7 +54,8 @@ func (model *Post) Delete(id string) error {
 	}
 }
 
-func (model *Post) Create() {
+func (model *Post) Create() error {
 	db := database.GetDB()
-	db.Create(&model)
+	result := db.Create(&model)
+	return result.Error
 }
