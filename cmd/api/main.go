@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/alima12/Blog-Go/api"
+	"github.com/alima12/Blog-Go/cmd/graph"
 	"github.com/alima12/Blog-Go/cmd/rpc"
 	"github.com/alima12/Blog-Go/models"
 	"github.com/alima12/Blog-Go/validations"
@@ -11,6 +12,10 @@ import (
 
 func main() {
 	e := echo.New()
+
+	//Start GraphQL Server
+	go graph.StartGraphQLServer(e)
+
 	//Load Env files
 	_ = godotenv.Load(".env")
 
