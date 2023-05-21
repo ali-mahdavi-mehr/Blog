@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+	custumerror "github.com/alima12/Blog-Go/custom_error"
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
 	"github.com/alima12/Blog-Go/validations"
@@ -13,7 +15,7 @@ import (
 func GetAllPost(c echo.Context) error {
 	db := database.GetDB()
 	var posts []models.Post
-	err := db.Model(&models.Post{}).Find(&posts).Error
+	err := db.Model(&models.Post{}).Order("views desc").Find(&posts).Error
 	if err != nil {
 		return err
 	}
@@ -50,7 +52,9 @@ func CreatePost(c echo.Context) error {
 	post.UserID = uint(id)
 
 	// Save Post
-	post.Create()
+	if err := post.Create(); err != nil {
+		return custumerror.FindDBError(err, "slug post")
+	}
 	return c.JSON(http.StatusCreated, post)
 }
 

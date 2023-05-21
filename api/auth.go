@@ -1,12 +1,14 @@
 package api
 
 import (
+	customError "github.com/alima12/Blog-Go/custom_error"
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
 	"github.com/alima12/Blog-Go/utils"
 	"github.com/alima12/Blog-Go/validations"
 	"github.com/labstack/echo"
 	"net/http"
+	"strconv"
 )
 
 func Login(c echo.Context) error {
@@ -18,8 +20,9 @@ func Login(c echo.Context) error {
 	if !utils.CheckPassword(password, user.Password) {
 		return echo.ErrUnauthorized
 	}
-	accessToken := utils.CreateToken("access", username)
-	refreshToken := utils.CreateToken("refresh", username)
+	userID := strconv.FormatUint(uint64(user.ID), 10)
+	accessToken := utils.CreateToken("access", userID)
+	refreshToken := utils.CreateToken("refresh", userID)
 	return c.JSON(http.StatusOK, echo.Map{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
@@ -40,12 +43,10 @@ func SignUp(c echo.Context) error {
 	_ = c.Bind(&user)
 
 	db := database.GetDB()
-
 	user.Password, _ = utils.HashPassword(user.Password)
 	result := db.Create(&user)
-
 	if result.Error != nil {
-		return echo.ErrBadRequest
+		return customError.FindDBError(result.Error, "user")
 	}
 
 	return c.JSON(http.StatusCreated, user)

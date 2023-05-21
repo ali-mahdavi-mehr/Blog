@@ -1,19 +1,38 @@
 package models
 
 import (
+	"database/sql/driver"
 	"errors"
 	"github.com/alima12/Blog-Go/database"
 	"gorm.io/gorm"
-	"time"
 )
+
+type Status string
+
+const (
+	Draft     Status = "draft"
+	Pending   Status = "pending"
+	Published Status = "published"
+)
+
+func (s *Status) Scan(value interface{}) error {
+	*s = Status(value.(string))
+	return nil
+}
+
+func (s Status) Value() (driver.Value, error) {
+	return string(s), nil
+}
 
 type Post struct {
 	gorm.Model
-	Title     string
-	UserID    uint
-	Body      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Slug     string `gorm:"not null, unique" json:"slug"`
+	Title    string `gorm:"not null" json:"title"`
+	UserID   uint   `gorm:"not null" json:"author"`
+	Content  string `gorm:"not null" json:"content"`
+	ImageURL string `json:"image_url"`
+	Status   Status `gorm:"not null;check:status IN ('draft', 'pending', 'published')" json:"status"`
+	Views    int64  `gorm:"default:0" json:"view_count"`
 }
 
 func (model *Post) GetOne(id string) error {
@@ -35,7 +54,8 @@ func (model *Post) Delete(id string) error {
 	}
 }
 
-func (model *Post) Create() {
+func (model *Post) Create() error {
 	db := database.GetDB()
-	db.Create(&model)
+	result := db.Create(&model)
+	return result.Error
 }
