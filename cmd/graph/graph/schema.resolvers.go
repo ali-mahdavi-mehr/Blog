@@ -6,35 +6,88 @@ package graph
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 
 	graphModel "github.com/alima12/Blog-Go/cmd/graph/graph/model"
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
+	"github.com/alima12/Blog-Go/utils"
 )
 
-// GetAllPosts is the resolver for the getAllPosts field.
-func (r *mutationResolver) GetAllPosts(ctx context.Context, input graphModel.Null) (*graphModel.Post, error) {
-	panic("not implemented")
+// CreatePost is the resolver for the createPost field.
+func (r *mutationResolver) CreatePost(ctx context.Context, input graphModel.CreatePost) (*graphModel.Post, error) {
+	var post models.Post
+	post.Title = input.Title
+	post.Content = input.Content
+	post.Slug = input.Slug
+	post.ImageURL = *input.ImageURL
+	post.UserID = uint(1)
+	post.Status = "published"
+	postStatus, _ := post.Status.Value()
+
+	db := database.GetDB()
+	err := db.Create(&post).Error
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &graphModel.Post{
+		ID:       int(post.ID),
+		Title:    post.Title,
+		Content:  post.Content,
+		Slug:     post.Slug,
+		UserID:   int(post.UserID),
+		ImageURL: post.ImageURL,
+		Views:    int(post.Views),
+		Status:   postStatus,
+	}, nil
 }
 
 // Posts is the resolver for the posts field.
-func (r *queryResolver) Posts(ctx context.Context) ([]*graphModel.Post, error) {
+func (r *queryResolver) Posts(ctx context.Context, where *graphModel.Conditions) ([]*graphModel.Post, error) {
 	db := database.GetDB()
 	var posts []models.Post
-	err := db.Model(&models.Post{}).Order("views desc").Find(&posts).Error
+	var err error
+	if where == nil {
+		err = db.Model(&models.Post{}).Order("views desc").Find(&posts).Error
+	} else {
+		// User can either send slug or user_id or both
+		// here create WHERE condition based on the input
+		slug := *where.Slug
+		userID := *where.UserID
+		var condition string
+		switch {
+		case slug != "None" && userID != "None":
+			condition = fmt.Sprintf("slug = '%s' AND user_id = %s", slug, userID)
+		case slug != "None":
+			condition = fmt.Sprintf("slug = '%s'", slug)
+		case userID != "None":
+			condition = fmt.Sprintf("user_id = %s", userID)
+		default:
+			return nil, errors.New("invalid input")
+		}
+		err = db.Model(&models.Post{}).Order("views desc").Where(condition).Find(&posts).Error
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
 	response := make([]*graphModel.Post, 0)
 	for _, post := range posts {
+		postCreatedTime, _ := utils.ConvertToTimestamp(post.CreatedAt)
+		postUpdatedTime, _ := utils.ConvertToTimestamp(post.UpdatedAt)
+		postStatus, _ := post.Status.Value()
 		response = append(response, &graphModel.Post{
-			Title:    post.Title,
-			Content:  post.Content,
-			Slug:     post.Slug,
-			UserID:   int(post.UserID),
-			ImageURL: post.ImageURL,
-			Views:    int(post.Views),
+			ID:        int(post.ID),
+			Title:     post.Title,
+			Content:   post.Content,
+			Slug:      post.Slug,
+			UserID:    int(post.UserID),
+			ImageURL:  post.ImageURL,
+			Status:    postStatus,
+			CreatedAt: int(postCreatedTime.Seconds),
+			UpdatedAt: int(postUpdatedTime.Seconds),
+			Views:     int(post.Views),
 		})
 	}
 	return response, nil

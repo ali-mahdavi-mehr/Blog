@@ -1,22 +1,32 @@
 type Query {
-  posts: [Post!]!
+  posts(where : Conditions): [Post]
 }
 
 type Post{
+  ID : Int!
   Slug: String!
   Title: String!
   UserID: Int!
   Content: String!
   ImageURL: String!
-  Status: Int!
+  Status: String!
   Views: Int!
+  CreatedAt: Int!
+  UpdatedAt: Int!
 }
 
-input Null{
-  ID: Int!
+input CreatePost{
+  Slug: String!
+  Title: String!
+  Content: String!
+  ImageUrl: String
+}
+input Conditions{
+  Slug: String = None
+  UserId: String = None
 }
 
 
 type Mutation {
-  getAllPosts(input: Null!): Query!
+  createPost(input: CreatePost!): Post!
 }

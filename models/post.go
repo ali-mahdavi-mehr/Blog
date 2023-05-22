@@ -1,10 +1,10 @@
 package models
 
 import (
-	"database/sql/driver"
 	"errors"
 	"github.com/alima12/Blog-Go/database"
 	"gorm.io/gorm"
+	"sync/atomic"
 )
 
 type Status string
@@ -20,7 +20,7 @@ func (s *Status) Scan(value interface{}) error {
 	return nil
 }
 
-func (s Status) Value() (driver.Value, error) {
+func (s Status) Value() (string, error) {
 	return string(s), nil
 }
 
@@ -35,18 +35,20 @@ type Post struct {
 	Views    int64  `gorm:"default:0" json:"view_count"`
 }
 
-func (model *Post) GetOne(id string) error {
+func (model *Post) GetOne(slug string) error {
 	db := database.GetDB()
-	result := db.First(&model, id)
+	result := db.First(&model, "slug = ?", slug)
 	if result.Error != nil {
-		return errors.New("")
+		return errors.New("post not found")
 	}
+	atomic.AddInt64(&model.Views, 1)
+	db.Save(&model)
 	return nil
 }
 
-func (model *Post) Delete(id string) error {
+func (model *Post) Delete(slug string) error {
 	db := database.GetDB()
-	result := db.Delete(&Post{}, "id = ?", id)
+	result := db.Delete(&Post{}, "slug = ?", slug)
 	if result.RowsAffected == 1 {
 		return nil
 	} else {

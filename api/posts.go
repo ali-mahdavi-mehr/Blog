@@ -24,7 +24,7 @@ func GetAllPost(c echo.Context) error {
 
 func GetOnePost(c echo.Context) error {
 	var post models.Post
-	err := post.GetOne(c.Param("id"))
+	err := post.GetOne(c.Param("slug"))
 	if err != nil {
 		return c.String(http.StatusNotFound, err.Error())
 	}
@@ -59,7 +59,7 @@ func CreatePost(c echo.Context) error {
 
 func DeletePost(c echo.Context) error {
 	var post models.Post
-	err := post.Delete(c.Param("id"))
+	err := post.Delete(c.Param("slug"))
 	if err != nil {
 		return c.String(http.StatusNotFound, err.Error())
 	} else {

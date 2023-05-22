@@ -2,16 +2,27 @@
 
 package model
 
-type Null struct {
-	ID int `json:"ID"`
+type Conditions struct {
+	Slug   *string `json:"Slug,omitempty"`
+	UserID *string `json:"UserId,omitempty"`
+}
+
+type CreatePost struct {
+	Slug     string  `json:"Slug"`
+	Title    string  `json:"Title"`
+	Content  string  `json:"Content"`
+	ImageURL *string `json:"ImageUrl,omitempty"`
 }
 
 type Post struct {
-	Slug     string `json:"Slug"`
-	Title    string `json:"Title"`
-	UserID   int    `json:"UserID"`
-	Content  string `json:"Content"`
-	ImageURL string `json:"ImageURL"`
-	Status   int    `json:"Status"`
-	Views    int    `json:"Views"`
+	ID        int    `json:"ID"`
+	Slug      string `json:"Slug"`
+	Title     string `json:"Title"`
+	UserID    int    `json:"UserID"`
+	Content   string `json:"Content"`
+	ImageURL  string `json:"ImageURL"`
+	Status    string `json:"Status"`
+	Views     int    `json:"Views"`
+	CreatedAt int    `json:"CreatedAt"`
+	UpdatedAt int    `json:"UpdatedAt"`
 }
