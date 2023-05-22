@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/alima12/Blog-Go/api"
 	"github.com/alima12/Blog-Go/cmd/graph"
 	"github.com/alima12/Blog-Go/cmd/rpc"
@@ -8,6 +9,7 @@ import (
 	"github.com/alima12/Blog-Go/validations"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
+	"os"
 )
 
 func main() {
@@ -35,5 +37,5 @@ func main() {
 	api.RegisterAPIs(e.Group("/api"))
 
 	//Start server
-	e.Logger.Fatal(e.Start(":8000"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", os.Getenv("API_PORT"))))
 }

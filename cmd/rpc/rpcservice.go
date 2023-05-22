@@ -7,11 +7,12 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
 )
 
 func StartRpcServer() {
 	_ = godotenv.Load(".env")
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", os.Getenv("RPC_PORT"))
 	if err != nil {
 		log.Fatal(err)
 	}

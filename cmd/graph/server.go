@@ -7,8 +7,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-const defaultPort = "8080"
-
 func StartGraphQLServer(e *echo.Echo) {
 	graphqlHandler := handler.NewDefaultServer(
 		graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}),
