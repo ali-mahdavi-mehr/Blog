@@ -6,6 +6,8 @@ package graph
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 
 	graphModel "github.com/alima12/Blog-Go/cmd/graph/graph/model"
@@ -20,7 +22,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input graphModel.Crea
 	post.Title = input.Title
 	post.Content = input.Content
 	post.Slug = input.Slug
-	post.ImageURL = input.ImageURL
+	post.ImageURL = *input.ImageURL
 	post.UserID = uint(1)
 	post.Status = "published"
 	postStatus, _ := post.Status.Value()
@@ -43,10 +45,30 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input graphModel.Crea
 }
 
 // Posts is the resolver for the posts field.
-func (r *queryResolver) Posts(ctx context.Context) ([]*graphModel.Post, error) {
+func (r *queryResolver) Posts(ctx context.Context, where *graphModel.Conditions) ([]*graphModel.Post, error) {
 	db := database.GetDB()
 	var posts []models.Post
-	err := db.Model(&models.Post{}).Order("views desc").Find(&posts).Error
+	var err error
+	if where == nil {
+		err = db.Model(&models.Post{}).Order("views desc").Find(&posts).Error
+	} else {
+		// User can either send slug or user_id or both
+		// here create WHERE condition based on the input
+		slug := *where.Slug
+		userID := *where.UserID
+		var condition string
+		switch {
+		case slug != "None" && userID != "None":
+			condition = fmt.Sprintf("slug = '%s' AND user_id = %s", slug, userID)
+		case slug != "None":
+			condition = fmt.Sprintf("slug = '%s'", slug)
+		case userID != "None":
+			condition = fmt.Sprintf("user_id = %s", userID)
+		default:
+			return nil, errors.New("invalid input")
+		}
+		err = db.Model(&models.Post{}).Order("views desc").Where(condition).Find(&posts).Error
+	}
 	if err != nil {
 		log.Fatal(err)
 	}

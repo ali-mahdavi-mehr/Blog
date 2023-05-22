@@ -2,11 +2,16 @@
 
 package model
 
+type Conditions struct {
+	Slug   *string `json:"Slug,omitempty"`
+	UserID *string `json:"UserId,omitempty"`
+}
+
 type CreatePost struct {
-	Slug     string `json:"Slug"`
-	Title    string `json:"Title"`
-	Content  string `json:"Content"`
-	ImageURL string `json:"ImageUrl"`
+	Slug     string  `json:"Slug"`
+	Title    string  `json:"Title"`
+	Content  string  `json:"Content"`
+	ImageURL *string `json:"ImageUrl,omitempty"`
 }
 
 type Post struct {

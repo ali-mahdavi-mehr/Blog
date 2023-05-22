@@ -1,5 +1,5 @@
 type Query {
-  posts: [Post!]!
+  posts(where : Conditions): [Post]
 }
 
 type Post{
@@ -19,7 +19,11 @@ input CreatePost{
   Slug: String!
   Title: String!
   Content: String!
-  ImageUrl: String!
+  ImageUrl: String
+}
+input Conditions{
+  Slug: String = None
+  UserId: String = None
 }
 
 
