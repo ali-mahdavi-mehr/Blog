@@ -3,13 +3,16 @@ type Query {
 }
 
 type Post{
+  ID : Int!
   Slug: String!
   Title: String!
   UserID: Int!
   Content: String!
   ImageURL: String!
-  Status: Int!
+  Status: String!
   Views: Int!
+  CreatedAt: Int!
+  UpdatedAt: Int!
 }
 
 input CreatePost{

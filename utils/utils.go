@@ -6,6 +6,8 @@ import (
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/google/uuid"
 	"os"
 	"strconv"
@@ -45,4 +47,12 @@ func CreateToken(tokenType, userId string) string {
 	go redisDB.Set(context.Background(), generatedAid, createdToken, -1)
 	return createdToken
 
+}
+
+func ConvertToTimestamp(t time.Time) (*timestamp.Timestamp, error) {
+	ts, err := ptypes.TimestampProto(t)
+	if err != nil {
+		return nil, err
+	}
+	return ts, nil
 }

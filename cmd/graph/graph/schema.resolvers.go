@@ -11,6 +11,7 @@ import (
 	graphModel "github.com/alima12/Blog-Go/cmd/graph/graph/model"
 	"github.com/alima12/Blog-Go/database"
 	"github.com/alima12/Blog-Go/models"
+	"github.com/alima12/Blog-Go/utils"
 )
 
 // CreatePost is the resolver for the createPost field.
@@ -22,18 +23,22 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input graphModel.Crea
 	post.ImageURL = input.ImageURL
 	post.UserID = uint(1)
 	post.Status = "published"
+	postStatus, _ := post.Status.Value()
+
 	db := database.GetDB()
 	err := db.Create(&post).Error
 	if err != nil {
 		log.Fatal(err)
 	}
 	return &graphModel.Post{
+		ID:       int(post.ID),
 		Title:    post.Title,
 		Content:  post.Content,
 		Slug:     post.Slug,
 		UserID:   int(post.UserID),
 		ImageURL: post.ImageURL,
 		Views:    int(post.Views),
+		Status:   postStatus,
 	}, nil
 }
 
@@ -47,13 +52,20 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*graphModel.Post, error) {
 	}
 	response := make([]*graphModel.Post, 0)
 	for _, post := range posts {
+		postCreatedTime, _ := utils.ConvertToTimestamp(post.CreatedAt)
+		postUpdatedTime, _ := utils.ConvertToTimestamp(post.UpdatedAt)
+		postStatus, _ := post.Status.Value()
 		response = append(response, &graphModel.Post{
-			Title:    post.Title,
-			Content:  post.Content,
-			Slug:     post.Slug,
-			UserID:   int(post.UserID),
-			ImageURL: post.ImageURL,
-			Views:    int(post.Views),
+			ID:        int(post.ID),
+			Title:     post.Title,
+			Content:   post.Content,
+			Slug:      post.Slug,
+			UserID:    int(post.UserID),
+			ImageURL:  post.ImageURL,
+			Status:    postStatus,
+			CreatedAt: int(postCreatedTime.Seconds),
+			UpdatedAt: int(postUpdatedTime.Seconds),
+			Views:     int(post.Views),
 		})
 	}
 	return response, nil

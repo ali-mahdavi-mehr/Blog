@@ -10,11 +10,14 @@ type CreatePost struct {
 }
 
 type Post struct {
-	Slug     string `json:"Slug"`
-	Title    string `json:"Title"`
-	UserID   int    `json:"UserID"`
-	Content  string `json:"Content"`
-	ImageURL string `json:"ImageURL"`
-	Status   int    `json:"Status"`
-	Views    int    `json:"Views"`
+	ID        int    `json:"ID"`
+	Slug      string `json:"Slug"`
+	Title     string `json:"Title"`
+	UserID    int    `json:"UserID"`
+	Content   string `json:"Content"`
+	ImageURL  string `json:"ImageURL"`
+	Status    string `json:"Status"`
+	Views     int    `json:"Views"`
+	CreatedAt int    `json:"CreatedAt"`
+	UpdatedAt int    `json:"UpdatedAt"`
 }
