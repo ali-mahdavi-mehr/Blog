@@ -13,8 +13,8 @@ func RegisterAPIs(router *echo.Group) {
 	//Posts
 	postRouter := router.Group("/post/")
 	postRouter.GET("", GetAllPost)
-	postRouter.GET(":id/", GetOnePost, middlewares.LoginRequired)
+	postRouter.GET(":slug/", GetOnePost, middlewares.LoginRequired)
 	postRouter.POST("", CreatePost, middlewares.LoginRequired)
-	postRouter.DELETE(":id/", DeletePost, middlewares.LoginRequired)
+	postRouter.DELETE(":slug/", DeletePost, middlewares.LoginRequired)
 
 }

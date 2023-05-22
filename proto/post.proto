@@ -1,19 +1,21 @@
 syntax = "proto3";
 package Post;
 option go_package = "./compiles";
-import "google/protobuf/timestamp.proto";
 
 message Empty{
 
 }
 
 message SinglePostResponse{
-  string Title = 1;
-  int32 UserID = 2;
-  string Body  = 3;
-
-  google.protobuf.Timestamp CreatedAt = 4;
-  google.protobuf.Timestamp UpdatedAt = 5;
+  int32 ID = 1;
+  string Title = 2;
+  string Slug = 3;
+  string Content = 4;
+  int64 Views = 5;
+  int32 UserID = 6;
+  string Status = 7;
+  int64 CreatedAt = 8;
+  int64 UpdatedAt = 9;
 }
 
 message AllPostResponse{
@@ -21,7 +23,7 @@ message AllPostResponse{
 }
 
 message RetrievePost{
-  int32 PostId = 1;
+  string Slug = 1;
 }
 
 service PostService {
