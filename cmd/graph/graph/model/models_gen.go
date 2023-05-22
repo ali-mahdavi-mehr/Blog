@@ -2,8 +2,11 @@
 
 package model
 
-type Null struct {
-	ID int `json:"ID"`
+type CreatePost struct {
+	Slug     string `json:"Slug"`
+	Title    string `json:"Title"`
+	Content  string `json:"Content"`
+	ImageURL string `json:"ImageUrl"`
 }
 
 type Post struct {
