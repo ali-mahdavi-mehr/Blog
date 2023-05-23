@@ -10,6 +10,9 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"os"
 	"strconv"
 	"strings"
@@ -88,4 +91,37 @@ func ConvertToTimestamp(t time.Time) (*timestamp.Timestamp, error) {
 		return nil, err
 	}
 	return ts, nil
+}
+
+func IsValidToken(token string) (bool, string, error) {
+	claims := models.Auth{}
+	bearerToken := strings.Replace(token, "Bearer ", "", 1)
+	_, err := jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("SECRET_KEY")), nil
+	})
+	if err != nil {
+		return false, "", errors.New("error in decode token")
+	}
+	db := database.GetRedisClient()
+	result := db.Get(context.TODO(), claims.Aid)
+	//userID := strconv.FormatUint(claims.UserId, 10)
+	if result.Val() == bearerToken {
+		return true, claims.UserId, nil
+	}
+	return false, "", errors.New("invalid token")
+}
+
+func CheckAuthorizationInGRPC(ctx context.Context) error {
+	data := metadata.ValueFromIncomingContext(ctx, "access_token")
+	if data == nil {
+		errMessage := "Unauthorized"
+		return status.Error(codes.Unauthenticated, errMessage)
+	}
+	ok, _, err := IsValidToken(data[0])
+	if !ok {
+		errMessage := err.Error()
+		return status.Error(codes.Unauthenticated, errMessage)
+	}
+	return nil
+
 }
