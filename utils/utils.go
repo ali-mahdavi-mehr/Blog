@@ -64,10 +64,13 @@ func CreateTokens(userId string) (string, string, error) {
 func GetTokenClaims(token string) (*models.Auth, error) {
 	claims := models.Auth{}
 	bearerToken := strings.Replace(token, "Bearer ", "", 1)
-	jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
-	return nil, errors.New("token expired")
+	if err != nil {
+		return nil, errors.New("token expired")
+	}
+	return &claims, nil
 
 }
 
@@ -100,17 +103,13 @@ func ConvertToTimestamp(t time.Time) (*timestamp.Timestamp, error) {
 }
 
 func IsValidToken(token string) (bool, string, error) {
-	claims := models.Auth{}
+	claims, err := GetTokenClaims(token)
 	bearerToken := strings.Replace(token, "Bearer ", "", 1)
-	_, err := jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("SECRET_KEY")), nil
-	})
 	if err != nil {
 		return false, "", errors.New("error in decode token")
 	}
 	db := database.GetRedisClient()
 	result := db.Get(context.TODO(), claims.Aid)
-	//userID := strconv.FormatUint(claims.UserId, 10)
 	if result.Val() == bearerToken {
 		return true, claims.UserId, nil
 	}
