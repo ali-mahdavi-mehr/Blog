@@ -19,8 +19,10 @@ func StartRpcServer() {
 	}
 	server := grpc.NewServer()
 
-	service := &manager.PostService{}
-	compiles.RegisterPostServiceServer(server, service)
+	servicePost := &manager.PostService{}
+	compiles.RegisterPostServiceServer(server, servicePost)
+	serviceAuth := &manager.AuthenticationService{}
+	compiles.RegisterAuthenticationServer(server, serviceAuth)
 	err = server.Serve(lis)
 	if err != nil {
 		log.Fatalf("imposible to serve: %s", err)
