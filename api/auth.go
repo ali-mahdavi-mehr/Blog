@@ -21,8 +21,10 @@ func Login(c echo.Context) error {
 		return echo.ErrUnauthorized
 	}
 	userID := strconv.FormatUint(uint64(user.ID), 10)
-	accessToken := utils.CreateToken("access", userID)
-	refreshToken := utils.CreateToken("refresh", userID)
+	accessToken, refreshToken, err := utils.CreateTokens(userID)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
