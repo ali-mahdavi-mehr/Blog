@@ -7,6 +7,7 @@ import (
 	"github.com/alima12/Blog-Go/service/compiles"
 	"github.com/alima12/Blog-Go/utils"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"strconv"
 )
@@ -55,5 +56,29 @@ func (auth *AuthenticationService) Logout(ctx context.Context, request *compiles
 	if err := utils.CheckAuthorizationInGRPC(ctx); err != nil {
 		return nil, err
 	}
+	return &compiles.Empty{}, nil
+}
+
+func (auth *AuthenticationService) ChangePassword(ctx context.Context, request *compiles.ChangePasswordRequest) (*compiles.Empty, error) {
+	if err := utils.CheckAuthorizationInGRPC(ctx); err != nil {
+		return nil, err
+	}
+	if request.Password != request.ConfirmPassword {
+		return nil, status.Error(codes.InvalidArgument, "Passwords don't match")
+	}
+	data := metadata.ValueFromIncomingContext(ctx, "access_token")
+	claims, err := utils.GetTokenClaims(data[0])
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, err.Error())
+	}
+
+	db := database.GetDB()
+	var user models.User
+	db.Model(&models.User{}).Find(&user, claims.UserId)
+	if !utils.CheckPassword(request.OldPassword, user.Password) {
+		return nil, status.Error(codes.Unauthenticated, "Invalid credentials")
+	}
+	user.Password, _ = utils.HashPassword(request.Password)
+	db.Save(&user)
 	return &compiles.Empty{}, nil
 }

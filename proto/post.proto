@@ -1,10 +1,7 @@
 syntax = "proto3";
 package Post;
 option go_package = "./compiles";
-
-message Empty{
-
-}
+import "proto/common.proto";
 
 message SinglePostResponse{
   int32 ID = 1;
@@ -28,6 +25,6 @@ message RetrievePost{
 
 service PostService {
   rpc GetSinglePost(RetrievePost) returns (SinglePostResponse);
-  rpc GetAllPosts(Empty) returns (AllPostResponse);
+  rpc GetAllPosts(Common.Empty) returns (AllPostResponse);
 
 }

@@ -25,6 +25,7 @@ type AuthenticationClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Token, error)
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*Token, error)
 	Logout(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type authenticationClient struct {
@@ -62,6 +63,15 @@ func (c *authenticationClient) Logout(ctx context.Context, in *Empty, opts ...gr
 	return out, nil
 }
 
+func (c *authenticationClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/Auth.Authentication/ChangePassword", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthenticationServer is the server API for Authentication service.
 // All implementations must embed UnimplementedAuthenticationServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type AuthenticationServer interface {
 	Login(context.Context, *LoginRequest) (*Token, error)
 	RefreshToken(context.Context, *RefreshTokenRequest) (*Token, error)
 	Logout(context.Context, *Empty) (*Empty, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*Empty, error)
 	mustEmbedUnimplementedAuthenticationServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedAuthenticationServer) RefreshToken(context.Context, *RefreshT
 }
 func (UnimplementedAuthenticationServer) Logout(context.Context, *Empty) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedAuthenticationServer) ChangePassword(context.Context, *ChangePasswordRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
 }
 func (UnimplementedAuthenticationServer) mustEmbedUnimplementedAuthenticationServer() {}
 
@@ -152,6 +166,24 @@ func _Authentication_Logout_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Authentication_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServer).ChangePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Auth.Authentication/ChangePassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Authentication_ServiceDesc is the grpc.ServiceDesc for Authentication service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var Authentication_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Logout",
 			Handler:    _Authentication_Logout_Handler,
+		},
+		{
+			MethodName: "ChangePassword",
+			Handler:    _Authentication_ChangePassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

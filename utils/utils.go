@@ -61,17 +61,23 @@ func CreateTokens(userId string) (string, string, error) {
 
 }
 
-func ExpireToken(token string) (int64, error) {
+func GetTokenClaims(token string) (*models.Auth, error) {
 	claims := models.Auth{}
 	bearerToken := strings.Replace(token, "Bearer ", "", 1)
-	_, err := jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
+	jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
-	if err != nil || claims.TokenType != "refresh_type" {
-		return 0, errors.New("to get new token must send  refresh token")
-	}
+	return nil, errors.New("token expired")
+
+}
+
+func ExpireToken(token string) (int64, error) {
+	claims, err := GetTokenClaims(token)
 	if err != nil {
-		return 0, errors.New("refresh token expired")
+		return 0, err
+	}
+	if claims.TokenType != "refresh_type" {
+		return 0, errors.New("to get new token must send  refresh token")
 	}
 
 	redisDB := database.GetRedisClient()
