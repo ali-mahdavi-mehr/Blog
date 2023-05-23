@@ -1,0 +1,24 @@
+syntax = "proto3";
+package Auth;
+option go_package = "./compiles";
+
+
+message Token{
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message RefreshTokenRequest{
+  string refresh_token = 1;
+}
+
+
+message LoginRequest{
+  string email = 1;
+  string password = 2;
+}
+
+service Authentication {
+  rpc Login(LoginRequest) returns (Token);
+  rpc RefreshToken(RefreshTokenRequest) returns (Token);
+}
