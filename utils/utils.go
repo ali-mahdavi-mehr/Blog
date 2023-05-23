@@ -130,3 +130,7 @@ func CheckAuthorizationInGRPC(ctx context.Context) error {
 	return nil
 
 }
+
+func RevokeAllTokens(userId string) error {
+	return nil
+}

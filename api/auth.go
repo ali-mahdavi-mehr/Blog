@@ -54,3 +54,15 @@ func SignUp(c echo.Context) error {
 	return c.JSON(http.StatusCreated, user)
 
 }
+
+func ChangePassword(c echo.Context) error {
+	//var MyValidator *validator.Validate
+	return nil
+
+}
+
+func Logout(c echo.Context) error {
+	//var MyValidator *validator.Validate
+	return nil
+
+}
