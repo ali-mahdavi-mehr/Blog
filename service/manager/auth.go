@@ -25,8 +25,10 @@ func (auth *AuthenticationService) Login(ctx context.Context, request *compiles.
 		return nil, status.Error(codes.Unauthenticated, "Invalid credentials")
 	}
 	userID := strconv.FormatUint(uint64(user.ID), 10)
-	accessToken := utils.CreateToken("access", userID)
-	refreshToken := utils.CreateToken("refresh", userID)
+	accessToken, refreshToken, err := utils.CreateTokens(userID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 	return &compiles.Token{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
@@ -34,5 +36,17 @@ func (auth *AuthenticationService) Login(ctx context.Context, request *compiles.
 }
 
 func (auth *AuthenticationService) RefreshToken(ctx context.Context, request *compiles.RefreshTokenRequest) (*compiles.Token, error) {
-	return nil, nil
+	userId, err := utils.ExpireToken(request.RefreshToken)
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, err.Error())
+	}
+	userID := strconv.FormatUint(uint64(userId), 10)
+	accessToken, refreshToken, tokenErr := utils.CreateTokens(userID)
+	if tokenErr != nil {
+		return nil, status.Error(codes.Internal, tokenErr.Error())
+	}
+	return &compiles.Token{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }
