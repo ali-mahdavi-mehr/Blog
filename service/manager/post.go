@@ -15,6 +15,10 @@ type PostService struct {
 }
 
 func (ps *PostService) GetSinglePost(ctx context.Context, request *compiles.RetrievePost) (*compiles.SinglePostResponse, error) {
+	if err := utils.CheckAuthorizationInGRPC(ctx); err != nil {
+		return nil, err
+	}
+
 	var post models.Post
 	err := post.GetOne(request.Slug)
 	if err != nil {
