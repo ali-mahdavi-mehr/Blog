@@ -8,9 +8,11 @@ import (
 func RegisterAPIs(router *echo.Group) {
 	//Auth
 	router.POST("/auth/login/", Login)
+	router.POST("/auth/refresh-token/", RefreshToken)
 	router.POST("/auth/sign-up/", SignUp)
 	router.GET("/auth/logout/", Logout, middlewares.LoginRequired)
-	router.POST("/auth/ChangePassword/", ChangePassword, middlewares.LoginRequired)
+	router.POST("/auth/change-password/", ChangePassword, middlewares.LoginRequired)
+	router.POST("/auth/delete-account/", DeleteAccount, middlewares.LoginRequired)
 
 	//Posts
 	postRouter := router.Group("/post/")

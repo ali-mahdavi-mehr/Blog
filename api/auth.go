@@ -66,3 +66,11 @@ func Logout(c echo.Context) error {
 	return nil
 
 }
+
+func RefreshToken(c echo.Context) error {
+	return nil
+}
+
+func DeleteAccount(c echo.Context) error {
+	return nil
+}
