@@ -50,3 +50,10 @@ func (auth *AuthenticationService) RefreshToken(ctx context.Context, request *co
 		RefreshToken: refreshToken,
 	}, nil
 }
+
+func (auth *AuthenticationService) Logout(ctx context.Context, request *compiles.Empty) (*compiles.Empty, error) {
+	if err := utils.CheckAuthorizationInGRPC(ctx); err != nil {
+		return nil, err
+	}
+	return &compiles.Empty{}, nil
+}

@@ -2,6 +2,7 @@ syntax = "proto3";
 package Auth;
 option go_package = "./compiles";
 
+import "proto/post.proto";
 
 message Token{
   string access_token = 1;
@@ -21,4 +22,5 @@ message LoginRequest{
 service Authentication {
   rpc Login(LoginRequest) returns (Token);
   rpc RefreshToken(RefreshTokenRequest) returns (Token);
+  rpc Logout(Post.Empty) returns (Post.Empty);
 }

@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthenticationClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Token, error)
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*Token, error)
+	Logout(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type authenticationClient struct {
@@ -52,12 +53,22 @@ func (c *authenticationClient) RefreshToken(ctx context.Context, in *RefreshToke
 	return out, nil
 }
 
+func (c *authenticationClient) Logout(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/Auth.Authentication/Logout", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthenticationServer is the server API for Authentication service.
 // All implementations must embed UnimplementedAuthenticationServer
 // for forward compatibility
 type AuthenticationServer interface {
 	Login(context.Context, *LoginRequest) (*Token, error)
 	RefreshToken(context.Context, *RefreshTokenRequest) (*Token, error)
+	Logout(context.Context, *Empty) (*Empty, error)
 	mustEmbedUnimplementedAuthenticationServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedAuthenticationServer) Login(context.Context, *LoginRequest) (
 }
 func (UnimplementedAuthenticationServer) RefreshToken(context.Context, *RefreshTokenRequest) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
+}
+func (UnimplementedAuthenticationServer) Logout(context.Context, *Empty) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
 }
 func (UnimplementedAuthenticationServer) mustEmbedUnimplementedAuthenticationServer() {}
 
@@ -120,6 +134,24 @@ func _Authentication_RefreshToken_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Authentication_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServer).Logout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Auth.Authentication/Logout",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServer).Logout(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Authentication_ServiceDesc is the grpc.ServiceDesc for Authentication service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var Authentication_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RefreshToken",
 			Handler:    _Authentication_RefreshToken_Handler,
+		},
+		{
+			MethodName: "Logout",
+			Handler:    _Authentication_Logout_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
