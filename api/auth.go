@@ -12,11 +12,11 @@ import (
 )
 
 func Login(c echo.Context) error {
-	username := c.FormValue("username")
+	email := c.FormValue("email")
 	password := c.FormValue("password")
 	db := database.GetDB()
 	var user models.User
-	db.Model(&models.User{}).Find(&user, "username = ?", username)
+	db.Model(&models.User{}).Find(&user, "email = ?", email)
 	if !utils.CheckPassword(password, user.Password) {
 		return echo.ErrUnauthorized
 	}
@@ -53,4 +53,24 @@ func SignUp(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, user)
 
+}
+
+func ChangePassword(c echo.Context) error {
+	//var MyValidator *validator.Validate
+	return nil
+
+}
+
+func Logout(c echo.Context) error {
+	//var MyValidator *validator.Validate
+	return nil
+
+}
+
+func RefreshToken(c echo.Context) error {
+	return nil
+}
+
+func DeleteAccount(c echo.Context) error {
+	return nil
 }

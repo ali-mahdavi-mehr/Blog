@@ -24,6 +24,10 @@ func generateAid() string {
 	return id.String()
 }
 
+func createAuthRedisKey(aid, userId string) string {
+	return fmt.Sprintf("%s_%s", aid, userId)
+}
+
 func createToken(tokenType, userId, aid string) (string, error) {
 	var JwtExpireTime int64
 	switch tokenType {
@@ -56,7 +60,7 @@ func CreateTokens(userId string) (string, string, error) {
 	accessToken, err = createToken("access", userId, generatedAid)
 	refreshToken, err = createToken("refresh", userId, generatedAid)
 	redisDB := database.GetRedisClient()
-	go redisDB.Set(context.Background(), generatedAid, accessToken, -1)
+	go redisDB.Set(context.Background(), createAuthRedisKey(generatedAid, userId), accessToken, -1)
 	return accessToken, refreshToken, err
 
 }
@@ -64,28 +68,32 @@ func CreateTokens(userId string) (string, string, error) {
 func GetTokenClaims(token string) (*models.Auth, error) {
 	claims := models.Auth{}
 	bearerToken := strings.Replace(token, "Bearer ", "", 1)
-	jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
-	return nil, errors.New("token expired")
+	if err != nil {
+		return nil, errors.New("token expired")
+	}
+	return &claims, nil
 
 }
 
-func ExpireToken(token string) (int64, error) {
+func ExpireToken(token string, isRefreshToken bool) (int64, error) {
 	claims, err := GetTokenClaims(token)
 	if err != nil {
 		return 0, err
 	}
-	if claims.TokenType != "refresh_type" {
+
+	if isRefreshToken && claims.TokenType != "refresh_type" {
 		return 0, errors.New("to get new token must send  refresh token")
 	}
-
 	redisDB := database.GetRedisClient()
-	result := redisDB.Get(context.TODO(), claims.Aid)
+	redisKey := createAuthRedisKey(claims.Aid, claims.UserId)
+	result := redisDB.Get(context.TODO(), redisKey)
 	if result.Val() == "" {
-		return 0, errors.New("refresh token expired")
+		return 0, errors.New("token already expired")
 	}
-	redisDB.Del(context.TODO(), claims.Aid)
+	redisDB.Del(context.TODO(), redisKey)
 	userID, _ := strconv.ParseInt(claims.UserId, 10, 64)
 	return userID, nil
 
@@ -100,17 +108,13 @@ func ConvertToTimestamp(t time.Time) (*timestamp.Timestamp, error) {
 }
 
 func IsValidToken(token string) (bool, string, error) {
-	claims := models.Auth{}
+	claims, err := GetTokenClaims(token)
 	bearerToken := strings.Replace(token, "Bearer ", "", 1)
-	_, err := jwt.ParseWithClaims(bearerToken, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("SECRET_KEY")), nil
-	})
 	if err != nil {
 		return false, "", errors.New("error in decode token")
 	}
 	db := database.GetRedisClient()
-	result := db.Get(context.TODO(), claims.Aid)
-	//userID := strconv.FormatUint(claims.UserId, 10)
+	result := db.Get(context.TODO(), createAuthRedisKey(claims.Aid, claims.UserId))
 	if result.Val() == bearerToken {
 		return true, claims.UserId, nil
 	}
@@ -130,4 +134,14 @@ func CheckAuthorizationInGRPC(ctx context.Context) error {
 	}
 	return nil
 
+}
+
+func RevokeAllTokens(userId string) {
+	db := database.GetRedisClient()
+	keys, _ := db.Keys(context.TODO(), createAuthRedisKey("*", userId)).Result()
+	for _, key := range keys {
+		if strings.Contains(key, userId) {
+			db.Del(context.TODO(), key)
+		}
+	}
 }

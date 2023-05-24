@@ -66,3 +66,7 @@ func DeletePost(c echo.Context) error {
 		return c.NoContent(http.StatusNoContent)
 	}
 }
+
+func UpdatePost(c echo.Context) error {
+	return nil
+}
