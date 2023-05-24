@@ -12,11 +12,11 @@ import (
 )
 
 func Login(c echo.Context) error {
-	username := c.FormValue("username")
+	email := c.FormValue("email")
 	password := c.FormValue("password")
 	db := database.GetDB()
 	var user models.User
-	db.Model(&models.User{}).Find(&user, "username = ?", username)
+	db.Model(&models.User{}).Find(&user, "email = ?", email)
 	if !utils.CheckPassword(password, user.Password) {
 		return echo.ErrUnauthorized
 	}
