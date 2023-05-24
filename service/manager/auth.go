@@ -71,6 +71,13 @@ func (auth *AuthenticationService) ChangePassword(ctx context.Context, request *
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
+	if request.ConfirmPassword != request.Password {
+		return nil, status.Error(codes.InvalidArgument, "Passwords don't match")
+	}
+
+	if request.OldPassword == request.Password {
+		return nil, status.Error(codes.InvalidArgument, "Old and new password are the same")
+	}
 
 	db := database.GetDB()
 	var user models.User
