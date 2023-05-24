@@ -15,6 +15,13 @@ message SinglePostResponse{
   int64 UpdatedAt = 9;
 }
 
+message PostRequest{
+  string Title = 1;
+  string Slug = 2;
+  string Content = 3;
+  string Status = 4;
+}
+
 message AllPostResponse{
   repeated SinglePostResponse posts = 1;
 }
@@ -26,5 +33,7 @@ message RetrievePost{
 service PostService {
   rpc GetSinglePost(RetrievePost) returns (SinglePostResponse);
   rpc GetAllPosts(Common.Empty) returns (AllPostResponse);
-
+  rpc UpdatePost(PostRequest) returns (SinglePostResponse);
+  rpc DeletePost(RetrievePost) returns (Common.Empty);
+  rpc CreatePost(PostRequest) returns (SinglePostResponse);
 }
