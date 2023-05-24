@@ -37,7 +37,7 @@ func (auth *AuthenticationService) Login(ctx context.Context, request *compiles.
 }
 
 func (auth *AuthenticationService) RefreshToken(ctx context.Context, request *compiles.RefreshTokenRequest) (*compiles.Token, error) {
-	userId, err := utils.ExpireToken(request.RefreshToken)
+	userId, err := utils.ExpireToken(request.RefreshToken, true)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
@@ -56,6 +56,12 @@ func (auth *AuthenticationService) Logout(ctx context.Context, request *compiles
 	if err := utils.CheckAuthorizationInGRPC(ctx); err != nil {
 		return nil, err
 	}
+	data := metadata.ValueFromIncomingContext(ctx, "access_token")[0]
+
+	if _, err := utils.ExpireToken(data, false); err != nil {
+		return nil, status.Error(codes.Unauthenticated, err.Error())
+	}
+
 	return &compiles.Empty{}, nil
 }
 
@@ -87,5 +93,6 @@ func (auth *AuthenticationService) ChangePassword(ctx context.Context, request *
 	}
 	user.Password, _ = utils.HashPassword(request.Password)
 	db.Save(&user)
+	go utils.RevokeAllTokens(claims.UserId)
 	return &compiles.Empty{}, nil
 }
