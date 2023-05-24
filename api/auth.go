@@ -62,7 +62,11 @@ func ChangePassword(c echo.Context) error {
 }
 
 func Logout(c echo.Context) error {
-	//var MyValidator *validator.Validate
+	token := c.Request().Header.Get("Authorization")
+	if _, err := utils.ExpireToken(token, false); err != nil {
+		return err
+	}
+
 	return nil
 
 }
