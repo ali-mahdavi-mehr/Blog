@@ -23,4 +23,8 @@ func RegisterAPIs(router *echo.Group) {
 	postRouter.PUT("/:slug/", UpdatePost, middlewares.LoginRequired)
 	postRouter.DELETE("/:slug/", DeletePost, middlewares.LoginRequired)
 
+	// Admin Routes
+	adminRouter := router.Group("/admin")
+	adminRouter.GET("/users/list/", GetAllUsers, middlewares.LoginRequired)
+
 }
